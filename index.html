@@ -12,6 +12,19 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- SCRIPT CRÍTICO PARA MÓVILES: Forzar posición superior antes de que cargue el DOM -->
+    <script>
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        if (window.location.hash) {
+            window.scrollTo(0, 0);
+            window.location.hash = '';
+        }
+    </script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -58,13 +71,6 @@
             }
         }
     </style>
-    <script>
-        // Forzar limpieza de memoria de scroll en móviles y navegadores
-        if ('scrollRestoration' in history) {
-            history.scrollRestoration = 'manual';
-        }
-        window.scrollTo(0, 0);
-    </script>
 </head>
 <body class="bg-slatebg text-slate-100 antialiased selection:bg-blue-500 selection:text-white">
 
@@ -640,7 +646,7 @@
 
     <!-- JavaScript: Scroll Spy & Charts Initialization -->
     <script>
-        // Forzar scroll inicial arriba de forma agresiva
+        // Forzar scroll arriba de manera inmediata al cargar
         window.scrollTo(0, 0);
         window.addEventListener('load', () => {
             window.scrollTo(0, 0);
