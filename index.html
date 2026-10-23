@@ -648,44 +648,41 @@
         </div>
     </footer>
 
-<!-- JavaScript: Scroll Spy Active Navigation & Charts Initialization -->
+<!-- JavaScript: Scroll Spy con IntersectionObserver (Exclusivo y sin solapes) -->
     <script>
-        // Scroll Spy & Active Nav Tab Effect (Optimizado y exclusivo para evitar doble selección)
         const sections = document.querySelectorAll('section[id]');
         const navTabs = document.querySelectorAll('.nav-tab');
 
-        function updateActiveNav() {
-            const scrollY = window.pageYOffset;
-            let currentSectionId = 'penguins'; // Por defecto la primera
+        // Configuración del observador para detectar qué sección está activa en pantalla
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px', // Activa la sección cuando cruza la parte superior de la pantalla
+            threshold: 0
+        };
 
-            sections.forEach(section => {
-                const sectionHeight = section.offsetHeight;
-                const sectionTop = section.offsetTop - 180; // Margen superior de compensación para móvil
-
-                if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
-                    currentSectionId = section.getAttribute('id');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const currentSectionId = entry.target.getAttribute('id');
+                    
+                    // Actualizamos las clases activas de la barra de navegación
+                    navTabs.forEach(tab => {
+                        if (tab.getAttribute('data-target') === currentSectionId) {
+                            tab.classList.add('bg-slate-800', 'text-white', 'shadow-xs');
+                            tab.classList.remove('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/60');
+                        } else {
+                            tab.classList.remove('bg-slate-800', 'text-white', 'shadow-xs');
+                            tab.classList.add('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/60');
+                        }
+                    });
                 }
             });
+        }, observerOptions);
 
-            // Validación estricta para forzar la sección de conclusiones si se llega al final de la página
-            if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 60) {
-                currentSectionId = 'conclusions';
-            }
-
-            // Aplicamos la clase activa a un único botón y la removemos de los demás
-            navTabs.forEach(tab => {
-                if (tab.getAttribute('data-target') === currentSectionId) {
-                    tab.classList.add('bg-slate-800', 'text-white', 'shadow-xs');
-                    tab.classList.remove('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/60');
-                } else {
-                    tab.classList.remove('bg-slate-800', 'text-white', 'shadow-xs');
-                    tab.classList.add('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/60');
-                }
-            });
-        }
-
-        window.addEventListener('scroll', updateActiveNav);
-        window.addEventListener('load', updateActiveNav);
+        // Ponemos a observar cada sección
+        sections.forEach(section => {
+            observer.observe(section);
+        });
 
         // Chart.js Global Default Settings for Dark Theme
         Chart.defaults.font.family = "'Inter', sans-serif";
