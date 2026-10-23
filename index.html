@@ -648,15 +648,15 @@
         </div>
     </footer>
 
-<!-- JavaScript: Scroll Spy con IntersectionObserver (Exclusivo y sin solapes) -->
+<!-- JavaScript: Scroll Spy con IntersectionObserver (Estado inicial limpio en Introducción al EDA) -->
     <script>
         const sections = document.querySelectorAll('section[id]');
         const navTabs = document.querySelectorAll('.nav-tab');
 
-        // Configuración del observador para detectar qué sección está activa en pantalla
+        // Configuración del observador
         const observerOptions = {
             root: null,
-            rootMargin: '-20% 0px -60% 0px', // Activa la sección cuando cruza la parte superior de la pantalla
+            rootMargin: '-20% 0px -60% 0px',
             threshold: 0
         };
 
@@ -665,7 +665,6 @@
                 if (entry.isIntersecting) {
                     const currentSectionId = entry.target.getAttribute('id');
                     
-                    // Actualizamos las clases activas de la barra de navegación
                     navTabs.forEach(tab => {
                         if (tab.getAttribute('data-target') === currentSectionId) {
                             tab.classList.add('bg-slate-800', 'text-white', 'shadow-xs');
@@ -679,9 +678,17 @@
             });
         }, observerOptions);
 
-        // Ponemos a observar cada sección
         sections.forEach(section => {
             observer.observe(section);
+        });
+
+        // Aseguramos que al cargar la página en la parte superior (Introducción al EDA), ningún botón quede enblanquecido por error
+        window.addEventListener('load', () => {
+            window.scrollTo(0, 0);
+            navTabs.forEach(tab => {
+                tab.classList.remove('bg-slate-800', 'text-white', 'shadow-xs');
+                tab.classList.add('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/60');
+            });
         });
 
         // Chart.js Global Default Settings for Dark Theme
@@ -975,6 +982,7 @@
 
         // 8. RMS Titanic: Embarkation Port (Doughnut Chart)
         const ctxTitanicEmbark = document.getElementById('titanicEmbarkChart').getContext('2d');
+        new Chart(ctxTitanicEmbark,`${'' /* fix template literal */}`);
         new Chart(ctxTitanicEmbark, {
             type: 'doughnut',
             data: {
@@ -987,12 +995,14 @@
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom' }
-                },
-                cutout: '65%'
+                responsive: cardOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    cutout: '65%'
+                }
             }
         });
     </script>
