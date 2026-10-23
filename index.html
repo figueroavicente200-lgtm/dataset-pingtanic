@@ -648,12 +648,668 @@
         </div>
     </footer>
 
-<!-- JavaScript: Scroll Spy con IntersectionObserver (Estado inicial limpio en Introducción al EDA) -->
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploración y análisis de datos | Dashboard Técnico</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slatebg: '#0B0F19',
+                        cardbg: '#131C2E',
+                        bordercolor: '#1E293B',
+                        penguin: {
+                            adelie: '#F59E0B',
+                            chinstrap: '#2DD4BF',
+                            gentoo: '#A78BFA'
+                        },
+                        titanic: {
+                            primary: '#38BDF8',
+                            secondary: '#94A3B8',
+                            accent: '#0EA5E9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0F19;
+            color: #F8FAFC;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            height: 320px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slatebg text-slate-100 antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Header & Navigation (Fixed z-index and pointer-events) -->
+    <header class="sticky top-0 z-[100] bg-[#0B0F19]/90 backdrop-blur-md border-b border-bordercolor transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-center md:text-left">
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-white">Exploración y análisis de datos</h1>
+                <p class="text-xs sm:text-sm text-slate-400 font-mono">De los datos a los patrones, de los patrones al conocimiento</p>
+            </div>
+
+            <!-- Segmented Pill Navigation Bar -->
+            <nav class="relative z-[101] flex items-center bg-[#131C2E] p-1.5 rounded-2xl border border-bordercolor text-sm font-medium shadow-xs">
+                <a href="#penguins" data-target="penguins" class="nav-tab relative z-10 flex items-center space-x-2 px-4 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all cursor-pointer">
+                    <svg class="w-4 h-4 text-amber-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                    <span class="pointer-events-none">Pingüinos de Palmer</span>
+                </a>
+                <a href="#titanic" data-target="titanic" class="nav-tab relative z-10 flex items-center space-x-2 px-4 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all cursor-pointer">
+                    <svg class="w-4 h-4 text-sky-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span class="pointer-events-none">Dataset Titanic</span>
+                </a>
+                <a href="#conclusions" data-target="conclusions" class="nav-tab relative z-10 flex items-center space-x-2 px-4 py-2 rounded-xl text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all cursor-pointer">
+                    <svg class="w-4 h-4 text-purple-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                    <span class="pointer-events-none">Conclusiones</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+
+        <!-- EDA Introduction Banner -->
+        <section class="bg-cardbg border border-bordercolor rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div class="max-w-3xl">
+                <span class="inline-block text-xs font-mono font-semibold uppercase tracking-wider text-sky-400 bg-sky-950/60 border border-sky-800/50 px-3 py-1 rounded-full mb-3">Introducción al EDA</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-3">Análisis exploratorio de datos (EDA)</h2>
+                <p class="text-slate-300 leading-relaxed text-base">
+                    Descubre cómo los datos permiten identificar patrones, comparar variables y obtener conclusiones mediante dos casos de estudio: las características físicas de los pingüinos y la supervivencia de los pasajeros del Titanic.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 1: PALMER PENGUINS -->
+        <section id="penguins" class="space-y-8 scroll-mt-48 md:scroll-mt-32">
+            <div class="border-b border-bordercolor pb-4">
+                <span class="text-xs font-mono font-semibold text-amber-400 uppercase tracking-wider">01 / Pingüinos de Palmer</span>
+                <h2 class="text-3xl font-bold text-white tracking-tight mt-1">Morfología y distribución en el Archipiélago Palmer</h2>
+                <p class="text-slate-300 mt-2 max-w-4xl text-base">
+                    Este dataset contiene mediciones físicas de tres especies de pingüinos observadas en las islas del archipiélago Palmer, en la Antártida. Su objetivo es estudiar diferencias morfológicas, distribución geográfica y relaciones entre variables, además de servir como ejemplo de clasificación y estadística descriptiva.
+                </p>
+            </div>
+
+            <!-- Species Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Adelie Card -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm hover:border-slate-700 transition-all duration-200 border-t-4 border-t-[#F59E0B] flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold text-white">Adelie</h3>
+                            <span class="w-3 h-3 rounded-full bg-[#F59E0B]"></span>
+                        </div>
+                        <div class="w-full h-44 bg-[#0B0F19] rounded-xl overflow-hidden mb-4 border border-bordercolor flex items-center justify-center p-2">
+                            <img src="images/adelie.jfif" alt="Pingüino Adelie" class="w-full h-full object-contain">
+                        </div>
+                        <div class="space-y-2 text-xs text-slate-300 bg-[#0B0F19] p-3 rounded-xl border border-bordercolor">
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Altura / Tamaño:</span>
+                                <span>Moderado (~70 cm)</span>
+                            </div>
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Peso Promedio:</span>
+                                <span>~3,700 g</span>
+                            </div>
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Población Estimada:</span>
+                                <span>~2.5 millones de parejas</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold text-slate-400">Ubicación / Islas:</span>
+                                <span>Torgersen, Biscoe, Dream</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chinstrap Card -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm hover:border-slate-700 transition-all duration-200 border-t-4 border-t-[#2DD4BF] flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold text-white">Chinstrap</h3>
+                            <span class="w-3 h-3 rounded-full bg-[#2DD4BF]"></span>
+                        </div>
+                        <div class="w-full h-44 bg-[#0B0F19] rounded-xl overflow-hidden mb-4 border border-bordercolor flex items-center justify-center p-2">
+                            <img src="images/chinstrap.jfif" alt="Pingüino Chinstrap" class="w-full h-full object-contain">
+                        </div>
+                        <div class="space-y-2 text-xs text-slate-300 bg-[#0B0F19] p-3 rounded-xl border border-bordercolor">
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Altura / Tamaño:</span>
+                                <span>Mediano (~75 cm)</span>
+                            </div>
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Peso Promedio:</span>
+                                <span>~3,733 g</span>
+                            </div>
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Población Estimada:</span>
+                                <span>~8 millones de parejas</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold text-slate-400">Ubicación / Islas:</span>
+                                <span>Isla Dream</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gentoo Card -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm hover:border-slate-700 transition-all duration-200 border-t-4 border-t-[#A78BFA] flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold text-white">Gentoo</h3>
+                            <span class="w-3 h-3 rounded-full bg-[#A78BFA]"></span>
+                        </div>
+                        <div class="w-full h-44 bg-[#0B0F19] rounded-xl overflow-hidden mb-4 border border-bordercolor flex items-center justify-center p-2">
+                            <img src="images/gentoo.jfif" alt="Pingüino Gentoo" class="w-full h-full object-contain">
+                        </div>
+                        <div class="space-y-2 text-xs text-slate-300 bg-[#0B0F19] p-3 rounded-xl border border-bordercolor">
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Altura / Tamaño:</span>
+                                <span>Grande (~90 cm)</span>
+                            </div>
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Peso Promedio:</span>
+                                <span>~5,076 g</span>
+                            </div>
+                            <div class="flex justify-between border-b border-bordercolor pb-1">
+                                <span class="font-semibold text-slate-400">Población Estimada:</span>
+                                <span>~300,000 parejas</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-semibold text-slate-400">Ubicación / Islas:</span>
+                                <span>Islas Biscoe</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Variables Overview Box -->
+            <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <h4 class="text-sm font-mono font-semibold text-slate-300 uppercase tracking-wider">Variables principales del dataset</h4>
+                    <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-3 py-1 rounded-md border border-bordercolor">Mismo orden de la planilla original (traducidas al español)</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Especie</span>
+                    <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Isla</span>
+                    <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Longitud del pico</span>
+                    <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Profundidad del pico</span>
+                    <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Longitud de las aletas</span>
+                    <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Masa corporal</span>
+                    <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Sexo</span>
+                    <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Año de observación</span>
+                </div>
+            </div>
+
+            <!-- Penguins Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Chart 1: Average Body Mass -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-white text-lg">Masa corporal promedio</h3>
+                            <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-2.5 py-1 rounded-md border border-bordercolor">Gramos (g)</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="penguinMassChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-bordercolor">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Gentoo presenta una masa corporal promedio superior a la de Adelie y Chinstrap. Esta diferencia permite observar cómo una variable física puede ayudar a distinguir especies y convertirse en una característica útil para un modelo de clasificación.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Flipper Length vs Body Mass -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-white text-lg">Aletas vs. Masa corporal</h3>
+                            <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-2.5 py-1 rounded-md border border-bordercolor">mm vs. g</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="penguinScatterChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-bordercolor">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            El gráfico permite observar la relación entre el tamaño de las aletas y la masa corporal. Una tendencia positiva indica que los ejemplares con aletas más largas suelen presentar mayor masa corporal. La distribución de los puntos también permite identificar agrupaciones entre especies.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Distribution by Island -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-white text-lg">Distribución por isla</h3>
+                            <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-2.5 py-1 rounded-md border border-bordercolor">Registros y proporción por zona</span>
+                        </div>
+                        <div class="chart-container flex items-center justify-center">
+                            <canvas id="penguinIslandChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-bordercolor">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            La distribución geográfica ayuda a comprender dónde se recopilaron los datos y a estudiar la presencia de las distintas especies en cada isla, reflejando hábitats específicos.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chart 4: Bill Morphological Profile -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-white text-lg">Perfil morfológico del pico</h3>
+                            <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-2.5 py-1 rounded-md border border-bordercolor">Largo vs. Profundidad (mm)</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="penguinBillChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-bordercolor">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Comparar las dimensiones del pico permite identificar diferencias morfológicas entre especies. Estas variables pueden aportar información para distinguirlas y formular hipótesis sobre sus características biológicas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IoT & Trail Chip Innovation Card: Hipótesis, Justificación y Defensa -->
+            <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 sm:p-8 shadow-sm relative overflow-hidden space-y-6">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-bl-full -z-0 opacity-50"></div>
+                <div class="relative z-10 space-y-6">
+                    <div>
+                        <span class="inline-block text-xs font-mono font-semibold uppercase tracking-wider text-amber-400 bg-amber-950/60 border border-amber-800/50 px-3 py-1 rounded-full mb-3">Investigación Científica & Hipótesis</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Validación morfológica, factores ocultos y telemetría</h3>
+                        <p class="text-slate-300 leading-relaxed text-sm sm:text-base">
+                            El análisis exploratorio del dataset Palmer Penguins permite plantear y contrastar hipótesis científicas sobre las características físicas, la distribución geográfica y el dimorfismo sexual de las especies.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-mono text-amber-400 font-semibold uppercase tracking-wider">H1 / Morfología Corporal</span>
+                                <h3 class="text-xl font-bold text-white mt-2 mb-3">Longitud de aletas vs. Masa</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    <strong class="text-white">Hipótesis:</strong> A mayor longitud de aletas, mayor masa corporal.<br><br>
+                                    <strong class="text-white">Defensa:</strong> Existe una asociación positiva biológicamente plausible. La tendencia visual indica tamaño proporcional, requiriendo análisis de correlación por especie y sexo para descartar sesgos.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-mono text-amber-400 font-semibold uppercase tracking-wider">H2 / Distribución Geográfica</span>
+                                <h3 class="text-xl font-bold text-white mt-2 mb-3">Especies según la Isla</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    <strong class="text-white">Hipótesis:</strong> La frecuencia de observaciones varía según la isla.<br><br>
+                                    <strong class="text-white">Defensa:</strong> El gráfico de dona muestra estructuración geográfica (Chinstrap en Dream, Gentoo en Biscoe, Adelie en las tres). Un modelo de clasificación podría aprender ubicación en lugar de morfología.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-mono text-amber-400 font-semibold uppercase tracking-wider">H3 / Perfil Morfológico</span>
+                                <h3 class="text-xl font-bold text-white mt-2 mb-3">Dimensiones del Pico</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    <strong class="text-white">Hipótesis:</strong> Largo y profundidad del pico presentan patrones diferenciados.<br><br>
+                                    <strong class="text-white">Defensa:</strong> Chinstrap destaca por mayor longitud media y Gentoo por menor profundidad relativa. Permiten formular reglas de clasificación complementarias.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-mono text-amber-400 font-semibold uppercase tracking-wider">H4 / Hipótesis Avanzada</span>
+                                <h3 class="text-xl font-bold text-white mt-2 mb-3">Dimorfismo Sexual</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    <strong class="text-white">Hipótesis:</strong> Parte de las diferencias observadas en masa, aletas y pico está asociada al sexo.<br><br>
+                                    <strong class="text-white">Defensa:</strong> No separar por sexo puede confundir las variaciones entre especies. Se requiere un modelo multivariable que controle interacciones complejas.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs space-y-2">
+                        <span class="text-xs font-mono text-amber-400 font-semibold uppercase tracking-wider">Evolución Tecnológica</span>
+                        <h3 class="text-xl font-bold text-white mt-2 mb-3">Del Registro Estático al Comportamiento</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Incorporar <strong class="text-white">GPS satelital, acelerómetros y sensores ambientales</strong> permitiría pasar de describir morfología física a analizar rutas de desplazamiento, profundidad de inmersión y respuestas ecológicas ante el cambio climático.
+                        </p>
+                    </div>
+
+                    <div class="bg-[#0B0F19] border border-bordercolor rounded-2xl p-6 shadow-xs space-y-2">
+                        <span class="text-xs font-mono text-slate-400 font-semibold uppercase tracking-wider">Conclusión científica final</span>
+                        <p class="text-slate-300 text-sm leading-relaxed mt-2">
+                            Las gráficas actuales respaldan diferencias morfológicas útiles para explorar clasificación, pero su validez requiere control por geografía, sexo y tratamiento riguroso de valores faltantes. Las asociaciones estadísticas observadas no demuestran por sí solas causalidad biológica o evolutiva directa sin validación experimental adicional.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Línea sutil de separación entre proyectos -->
+        <div class="relative flex py-5 items-center">
+            <div class="flex-grow border-t border-bordercolor"></div>
+            <span class="flex-shrink mx-4 text-xs font-mono text-slate-500 uppercase tracking-widest">Siguiente Caso de Estudio</span>
+            <div class="flex-grow border-t border-bordercolor"></div>
+        </div>
+
+        <!-- SECTION 2: RMS TITANIC -->
+        <section id="titanic" class="space-y-8 scroll-mt-48 md:scroll-mt-32">
+            <div class="border-b border-bordercolor pb-4">
+                <span class="text-xs font-mono font-semibold text-sky-400 uppercase tracking-wider">02 / Dataset Titanic</span>
+                <h2 class="text-3xl font-bold text-white tracking-tight mt-1">Supervivencia y demografía en el hundimiento de 1912</h2>
+                <p class="text-slate-300 mt-2 max-w-4xl text-base">
+                    Este dataset permite investigar qué características de los pasajeros estuvieron asociadas con una mayor o menor probabilidad de supervivencia durante el hundimiento de 1912, estudiando patrones relacionados con el sexo, la edad, la clase socioeconómica y las condiciones de evacuación.
+                </p>
+            </div>
+
+            <!-- Titanic Variables & Objective Box -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <h4 class="text-sm font-mono font-semibold text-slate-300 uppercase tracking-wider">Variables principales del Titanic</h4>
+                        <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-3 py-1 rounded-md border border-bordercolor">Mismo orden de la planilla original (traducidas al español)</span>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Supervivencia (Survived)</span>
+                        <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Clase del pasajero (Pclass)</span>
+                        <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Sexo (Sex)</span>
+                        <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Edad (Age)</span>
+                        <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Tarifa (Fare)</span>
+                        <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Puerto de embarque (Embarked)</span>
+                        <span class="bg-[#0B0F19] text-slate-300 text-xs font-mono px-3 py-1.5 rounded-lg border border-bordercolor">Familiares a bordo (SibSp / Parch)</span>
+                    </div>
+                </div>
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-center">
+                    <h4 class="text-sm font-mono font-semibold text-sky-400 uppercase tracking-wider mb-2">Pregunta central</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        ¿Qué características de los pasajeros estuvieron más fuertemente asociadas con su supervivencia y qué nos revelan sobre las desigualdades durante la evacuación?
+                    </p>
+                </div>
+            </div>
+
+            <!-- Titanic Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Chart 1: Survival by Class -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-white text-lg">Supervivencia por clase</h3>
+                            <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-2.5 py-1 rounded-md border border-bordercolor">Porcentaje (%)</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="titanicClassChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-bordercolor">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Los pasajeros de primera clase tuvieron una tasa de supervivencia considerablemente mayor que los de tercera clase, reflejando diferencias socioeconómicas y de ubicación.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Survival by Sex -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-white text-lg">Supervivencia por sexo</h3>
+                            <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-2.5 py-1 rounded-md border border-bordercolor">Porcentaje (%)</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="titanicSexChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-bordercolor">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            El sexo presenta una de las asociaciones más marcadas (aprox. 74,2% en mujeres vs. 18,9% en hombres), consistente con las prácticas prioritarias de evacuación de la época.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chart 3: Survival by Age Group -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-white text-lg">Supervivencia por grupos de edad</h3>
+                            <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-2.5 py-1 rounded-md border border-bordercolor">Porcentaje (%)</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="titanicAgeChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-bordercolor">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Permite estudiar si los niños, adultos jóvenes y personas mayores tuvieron resultados distintos, considerando el impacto de los registros de edades faltantes.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chart 4: Embarkation Port -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-white text-lg">Puerto de embarque</h3>
+                            <span class="text-xs font-mono text-slate-400 bg-[#0B0F19] px-2.5 py-1 rounded-md border border-bordercolor">Pasajeros</span>
+                        </div>
+                        <div class="chart-container flex items-center justify-center">
+                            <canvas id="titanicEmbarkChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-bordercolor">
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Describe la procedencia en Southampton, Cherbourg y Queenstown, mostrando de dónde procedían los pasajeros al embarcar sin implicar causalidad directa en la supervivencia.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Investigación Histórica & Hipótesis: RMS Titanic -->
+            <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 sm:p-8 shadow-sm relative overflow-hidden space-y-6">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-bl-full -z-0 opacity-50"></div>
+                <div class="relative z-10 space-y-6">
+                    <div>
+                        <span class="inline-block text-xs font-mono font-semibold uppercase tracking-wider text-sky-400 bg-sky-950/60 border border-sky-800/50 px-3 py-1 rounded-full mb-3">Investigación Histórica & Hipótesis</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Validación sociodemográfica del desastre de 1912</h3>
+                        <p class="text-slate-300 leading-relaxed text-sm sm:text-base">
+                            El análisis del dataset del Titanic permite plantear y contrastar hipótesis científicas sobre cómo las variables sociales, de género y de edad condicionaron la supervivencia humana.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-mono text-sky-400 font-semibold uppercase tracking-wider">H1 / Desigualdad de Género</span>
+                                <h3 class="text-xl font-bold text-white mt-2 mb-3">Supervivencia asociada al Sexo</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    <strong class="text-white">Hipótesis:</strong> Las mujeres presentaron una tasa de supervivencia superior a la de los hombres.<br><br>
+                                    <strong class="text-white">Defensa:</strong> La diferencia observada en los datos es considerable y coincide con las prácticas prioritarias de evacuación de la época ("mujeres y niños primero").
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-mono text-sky-400 font-semibold uppercase tracking-wider">H2 / Oportunidad Socioeconómica</span>
+                                <h3 class="text-xl font-bold text-white mt-2 mb-3">Clase Social y Supervivencia</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    <strong class="text-white">Hipótesis:</strong> Los pasajeros de primera clase tuvieron una mayor probabilidad de sobrevivir que los de tercera clase.<br><br>
+                                    <strong class="text-white">Defensa:</strong> Las tasas muestran diferencias importantes entre las categorías, vinculadas a la ubicación de los alojamientos y el acceso directo a las zonas de evacuación.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-mono text-sky-400 font-semibold uppercase tracking-wider">H3 / Factores Etarios</span>
+                                <h3 class="text-xl font-bold text-white mt-2 mb-3">Patrones por Grupos de Edad</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    <strong class="text-white">Hipótesis:</strong> Los niños presentaron patrones de supervivencia diferentes a los de los adultos.<br><br>
+                                    <strong class="text-white">Defensa:</strong> Las prácticas institucionales de la época hacen relevante investigar esta relación etaria, considerando el tratamiento riguroso de las edades faltantes.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-mono text-sky-400 font-semibold uppercase tracking-wider">H4 / Redes de Apoyo</span>
+                                <h3 class="text-xl font-bold text-white mt-2 mb-3">Composición Familiar</h3>
+                                <p class="text-slate-300 text-sm leading-relaxed">
+                                    <strong class="text-white">Hipótesis:</strong> La supervivencia varió según la cantidad de familiares que viajaban juntos.<br><br>
+                                    <strong class="text-white">Defensa:</strong> Los vínculos familiares (SibSp y Parch) influyeron en las decisiones de evacuación, requiriendo controlar variables como tamaño de familia, clase y edad.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#0B0F19] border border-bordercolor p-6 rounded-2xl shadow-xs space-y-2">
+                        <span class="text-xs font-mono text-sky-400 font-semibold uppercase tracking-wider">Interpretación Avanzada</span>
+                        <h3 class="text-xl font-bold text-white mt-2 mb-3">¿Por qué es necesario cruzar las variables (Modelo Multivariable)?</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            Si analizamos la clase social por separado, veremos que la 3ª clase se hunde estadísticamente. Sin embargo, un análisis superficial omite que dentro de la misma 3ª clase las tasas cambiaban drásticamente según el género. La interpretación avanzada demuestra que <strong class="text-white">ninguna variable actúa de forma aislada</strong>: cruzar simultáneamente el sexo, la edad y la clase es el único método válido para evitar conclusiones engañosas, neutralizar vacíos de información (edades o cabinas no registradas) y comprender el verdadero trasfondo de las cifras.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: TECHNICAL CONCLUSIONS -->
+        <section id="conclusions" class="space-y-8 scroll-mt-48 md:scroll-mt-32">
+            <div class="border-b border-bordercolor pb-4">
+                <span class="text-xs font-mono font-semibold text-purple-400 uppercase tracking-wider">03 / Conclusiones finales</span>
+                <h2 class="text-3xl font-bold text-white tracking-tight mt-1">Relevancia y valor analítico del proyecto</h2>
+                <p class="text-slate-300 mt-2 max-w-4xl text-base">
+                    Sintetizando los aprendizajes de los casos de estudio desde la perspectiva de la ingeniería de software y el análisis crítico de datos.
+                </p>
+            </div>
+
+            <!-- Three Conclusion Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <span class="text-xs font-mono text-purple-400 font-semibold uppercase tracking-wider">01 / Sesgo Geográfico</span>
+                        <h3 class="text-xl font-bold text-white">El sesgo de ubicación y características</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            <strong>El desafío analítico:</strong> En los pingüinos, la especie <em>Chinstrap</em> solo aparece en la isla Dream. Si un modelo predice sin depurar la geografía, aprenderá a mirar el nombre de la isla en vez del pico.
+                        </p>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            <strong>Perspectiva de ingeniería:</strong> En la industria, equivale a bloquear transacciones legítimas por región confundiendo contexto con fraude. El ingeniero debe aplicar una correcta <em>ingeniería de características</em> para aislar variables de contexto.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <span class="text-xs font-mono text-purple-400 font-semibold uppercase tracking-wider">02 / Integridad de Datos</span>
+                        <h3 class="text-xl font-bold text-white">Gestión de nulos y contratos</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            <strong>El desafío analítico:</strong> Las edades faltantes en el Titanic romperían un pipeline si no se gestionan de forma adecuada.
+                        </p>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            <strong>Perspectiva de ingeniería:</strong> Así como se validan formularios o pasarelas de pago en desarrollo web para evitar errores de producción, en analítica se deben aplicar esquemas estrictos de imputación y control de nulos.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-cardbg border border-bordercolor rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+                    <div class="space-y-3">
+                        <span class="text-xs font-mono text-purple-400 font-semibold uppercase tracking-wider">03 / Pensamiento Crítico</span>
+                        <h3 class="text-xl font-bold text-white">Asociación vs. Causalidad</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            <strong>El desafío analítico:</strong> Viajar en 1ª clase correlaciona con sobrevivir en el Titanic, pero no fue la causa física directa del rescate.
+                        </p>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            <strong>Perspectiva de ingeniería:</strong> En software, asumir que una sección de ayuda "impulsa" ventas por simple asociación sin evaluar sesgos de selección lleva a rediseños erróneos. Es vital usar experimentación controlada (pruebas A/B).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-cardbg border-t border-bordercolor mt-20 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 font-mono space-y-4 sm:space-y-0">
+            <div>
+                <p>Dashboard Técnico de Análisis de Datos • 2026</p>
+            </div>
+            <div>
+                <p class="text-slate-400">Desarrollo Académico e Investigación Exploratoria</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript: Scroll Spy & Charts Initialization -->
+    <script>
+        // Forzar scroll inicial arriba y desactivar restauración automática
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        window.addEventListener('beforeunload', () => {
+            window.scrollTo(0, 0);
+        });
+
+        window.addEventListener('load', () => {
+            window.scrollTo(0, 0);
+            navTabs.forEach(tab => {
+                tab.classList.remove('bg-slate-800', 'text-white', 'shadow-xs');
+                tab.classList.add('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/60');
+            });
+        });
+
         const sections = document.querySelectorAll('section[id]');
         const navTabs = document.querySelectorAll('.nav-tab');
 
-        // Configuración del observador
         const observerOptions = {
             root: null,
             rootMargin: '-20% 0px -60% 0px',
@@ -680,15 +1336,6 @@
 
         sections.forEach(section => {
             observer.observe(section);
-        });
-
-        // Aseguramos que al cargar la página en la parte superior (Introducción al EDA), ningún botón quede enblanquecido por error
-        window.addEventListener('load', () => {
-            window.scrollTo(0, 0);
-            navTabs.forEach(tab => {
-                tab.classList.remove('bg-slate-800', 'text-white', 'shadow-xs');
-                tab.classList.add('text-slate-300', 'hover:text-white', 'hover:bg-slate-800/60');
-            });
         });
 
         // Chart.js Global Default Settings for Dark Theme
@@ -796,7 +1443,7 @@
             }
         });
 
-        // 3. Palmer Penguins: Distribution by Island (Doughnut Chart) with clear percentages and observations tooltip
+        // 3. Palmer Penguins: Distribution by Island (Doughnut Chart)
         const ctxPenguinIsland = document.getElementById('penguinIslandChart').getContext('2d');
         new Chart(ctxPenguinIsland, {
             type: 'doughnut',
@@ -982,7 +1629,6 @@
 
         // 8. RMS Titanic: Embarkation Port (Doughnut Chart)
         const ctxTitanicEmbark = document.getElementById('titanicEmbarkChart').getContext('2d');
-        new Chart(ctxTitanicEmbark,`${'' /* fix template literal */}`);
         new Chart(ctxTitanicEmbark, {
             type: 'doughnut',
             data: {
@@ -995,14 +1641,12 @@
                 }]
             },
             options: {
-                responsive: cardOptions = {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    },
-                    cutout: '65%'
-                }
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                },
+                cutout: '65%'
             }
         });
     </script>
